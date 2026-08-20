@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arena of Azeroth — PvP</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <!-- Main Menu -->
+    <div id="main-menu" class="screen active">
+      <div class="menu-bg"></div>
+      <h1 class="game-title">Arena of Azeroth</h1>
+      <p class="subtitle">Player vs Player Combat</p>
+      <div class="menu-buttons">
+        <button class="wow-btn" id="btn-play">Enter Arena</button>
+        <button class="wow-btn secondary" id="btn-howto">How to Play</button>
+      </div>
+    </div>
+
+    <!-- Character Select -->
+    <div id="char-select" class="screen">
+      <div class="menu-bg"></div>
+      <h2 class="screen-title">Choose Your Champion</h2>
+      <div id="char-grid" class="char-grid"></div>
+      <div id="char-preview" class="char-preview">
+        <div id="preview-portrait"></div>
+        <div class="preview-info">
+          <h3 id="preview-name">—</h3>
+          <p id="preview-class">—</p>
+          <p id="preview-desc">Select a character</p>
+          <div id="preview-stats" class="preview-stats"></div>
+          <div id="preview-abilities" class="preview-abilities"></div>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="wow-btn secondary" id="btn-back-menu">Back</button>
+        <button class="wow-btn" id="btn-to-maps" disabled>Select Champion</button>
+      </div>
+    </div>
+
+    <!-- Map Select -->
+    <div id="map-select" class="screen">
+      <div class="menu-bg"></div>
+      <h2 class="screen-title">Choose Your Battleground</h2>
+      <div id="map-grid" class="map-grid"></div>
+      <div id="map-preview" class="map-preview">
+        <h3 id="map-name">—</h3>
+        <p id="map-desc">Select an arena</p>
+        <div id="map-features" class="map-features"></div>
+      </div>
+      <div class="nav-buttons">
+        <button class="wow-btn secondary" id="btn-back-char">Back</button>
+        <button class="wow-btn" id="btn-start-fight" disabled>Enter Battle</button>
+      </div>
+    </div>
+
+    <!-- How to Play -->
+    <div id="howto" class="screen">
+      <div class="menu-bg"></div>
+      <h2 class="screen-title">How to Play</h2>
+      <div class="howto-content">
+        <div class="howto-section">
+          <h3>Movement</h3>
+          <p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or Arrow Keys — Move your champion</p>
+        </div>
+        <div class="howto-section">
+          <h3>Combat</h3>
+          <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> — Use abilities</p>
+          <p><kbd>Space</kbd> — Basic attack (auto-attack when in range)</p>
+        </div>
+        <div class="howto-section">
+          <h3>Objective</h3>
+          <p>Defeat your opponent in 1v1 arena combat. First to reduce enemy health to zero wins the round. Best of 3 rounds wins the match!</p>
+        </div>
+        <div class="howto-section">
+          <h3>Classes</h3>
+          <p>Each class has unique abilities and playstyles. Warriors charge into melee, Mages kite with spells, Rogues burst from stealth, and Priests balance damage with healing.</p>
+        </div>
+      </div>
+      <button class="wow-btn" id="btn-howto-back">Back</button>
+    </div>
+
+    <!-- Game Canvas -->
+    <div id="game-screen" class="screen">
+      <canvas id="game-canvas"></canvas>
+      <div id="hud">
+        <div class="hud-top">
+          <div class="player-frame ally">
+            <div class="frame-portrait" id="ally-portrait"></div>
+            <div class="frame-bars">
+              <span id="ally-name">You</span>
+              <div class="bar health-bar"><div id="ally-health" class="bar-fill"></div></div>
+              <div class="bar resource-bar"><div id="ally-resource" class="bar-fill"></div></div>
+            </div>
+          </div>
+          <div class="round-info">
+            <span id="round-text">Round 1</span>
+            <span id="score-text">0 — 0</span>
+          </div>
+          <div class="player-frame enemy">
+            <div class="frame-bars">
+              <span id="enemy-name">Enemy</span>
+              <div class="bar health-bar"><div id="enemy-health" class="bar-fill"></div></div>
+              <div class="bar resource-bar"><div id="enemy-resource" class="bar-fill"></div></div>
+            </div>
+            <div class="frame-portrait" id="enemy-portrait"></div>
+          </div>
+        </div>
+        <div class="hud-bottom">
+          <div id="ability-bar" class="ability-bar"></div>
+          <div id="combat-log" class="combat-log"></div>
+        </div>
+      </div>
+      <div id="countdown" class="countdown hidden">3</div>
+      <div id="result-overlay" class="result-overlay hidden">
+        <h2 id="result-title">Victory!</h2>
+        <p id="result-subtitle">Round won</p>
+        <button class="wow-btn" id="btn-next-round">Continue</button>
+        <button class="wow-btn secondary" id="btn-exit-arena">Exit Arena</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
