@@ -65,7 +65,7 @@ html, body {
   content: "";
   position: absolute; inset: 0;
   background-image:
-    linear-gradient(rgba(201,163,90,.05) 1px, transparent 1px),
+    linear-gradient(rgba(180, 128, 30, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(201,163,90,.05) 1px, transparent 1px);
   background-size: 42px 42px;
   mask-image: radial-gradient(ellipse at 50% 40%, black 0%, transparent 72%);

@@ -29,16 +29,33 @@ function resourceLabel(champ) {
 }
 
 function renderCharGrid() {
-  charGrid.innerHTML = '';
+  while (charGrid.firstChild) {
+    charGrid.removeChild(charGrid.firstChild);
+  }
+
   CHAMPIONS.forEach(champ => {
     const card = document.createElement('div');
     card.className = 'char-card';
     card.dataset.id = champ.id;
-    card.innerHTML = `
-      <div class="char-portrait" style="background:radial-gradient(circle at 35% 30%, ${champ.color}cc, #14100c); color:#fff">${champ.icon}</div>
-      <div class="char-card-name">${champ.name.split(' ')[0]}</div>
-      <div class="char-card-class">${champ.className}</div>
-    `;
+
+    // Portrait
+    const portrait = document.createElement('div');
+    portrait.className = 'char-portrait';
+    portrait.style.background = `radial-gradient(circle at 35% 30%, ${champ.color}cc, #14100c)`;
+    portrait.style.color = '#fff';
+    portrait.textContent = champ.icon;
+
+    // Name
+    const name = document.createElement('div');
+    name.className = 'char-card-name';
+    name.textContent = champ.name.split(' ')[0];
+
+    // Class
+    const classEl = document.createElement('div');
+    classEl.className = 'char-card-class';
+    classEl.textContent = champ.className;
+
+    card.append(portrait, name, classEl);
     card.addEventListener('click', () => selectChampion(champ));
     charGrid.appendChild(card);
   });
@@ -46,28 +63,79 @@ function renderCharGrid() {
 
 function selectChampion(champ) {
   selectedChampion = champ;
-  [...charGrid.children].forEach(c => c.classList.toggle('selected', c.dataset.id === champ.id));
+
+  // Highlight selected card
+  [...charGrid.children].forEach(c => {
+    c.classList.toggle('selected', c.dataset.id === champ.id);
+  });
+
+  // Simple text fields (already safe, but kept for completeness)
   document.getElementById('preview-name').textContent = champ.name;
   document.getElementById('preview-class').textContent = champ.className;
   document.getElementById('preview-desc').textContent = champ.desc;
+
+  // Portrait background via CSSOM
   document.getElementById('preview-portrait').style.background =
     `radial-gradient(circle at 35% 30%, ${champ.color}cc, #14100c)`;
-  document.getElementById('preview-stats').innerHTML = `
-    <span>Health <b>${champ.health}</b></span>
-    <span>Speed <b>${champ.speed}</b></span>
-    <span>Resource <b>${resourceLabel(champ)}</b></span>
-  `;
-  document.getElementById('preview-abilities').innerHTML = champ.abilities.map(a => `
-    <div class="ability-detail">
-      <div class="ability-detail-head">
-        <span class="key">${a.key}</span>
-        <span class="ad-icon">${a.icon}</span>
-        <span class="ad-name">${a.name}</span>
-        <span class="ad-meta">${a.cost ? `${a.cost} ${resourceLabel(champ)}` : 'No cost'} · ${a.cooldown}s CD</span>
-      </div>
-      <p class="ad-desc">${a.desc}</p>
-    </div>
-  `).join('');
+
+  // Stats – build with DOM instead of innerHTML
+  const statsEl = document.getElementById('preview-stats');
+  while (statsEl.firstChild) statsEl.removeChild(statsEl.firstChild);
+
+  const makeStat = (label, value) => {
+    const span = document.createElement('span');
+    span.append(label + ' ');
+    const b = document.createElement('b');
+    b.textContent = value;
+    span.append(b);
+    return span;
+  };
+
+  statsEl.append(
+    makeStat('Health', champ.health),
+    makeStat('Speed', champ.speed),
+    makeStat('Resource', resourceLabel(champ))
+  );
+
+  // Abilities – build with DOM
+  const abilitiesEl = document.getElementById('preview-abilities');
+  while (abilitiesEl.firstChild) abilitiesEl.removeChild(abilitiesEl.firstChild);
+
+  champ.abilities.forEach(a => {
+    const detail = document.createElement('div');
+    detail.className = 'ability-detail';
+
+    const head = document.createElement('div');
+    head.className = 'ability-detail-head';
+
+    const key = document.createElement('span');
+    key.className = 'key';
+    key.textContent = a.key;
+
+    const icon = document.createElement('span');
+    icon.className = 'ad-icon';
+    icon.textContent = a.icon;
+
+    const name = document.createElement('span');
+    name.className = 'ad-name';
+    name.textContent = a.name;
+
+    const meta = document.createElement('span');
+    meta.className = 'ad-meta';
+    meta.textContent = a.cost
+      ? `${a.cost} ${resourceLabel(champ)} · ${a.cooldown}s CD`
+      : `No cost · ${a.cooldown}s CD`;
+
+    head.append(key, icon, name, meta);
+
+    const desc = document.createElement('p');
+    desc.className = 'ad-desc';
+    desc.textContent = a.desc;
+
+    detail.append(head, desc);
+    abilitiesEl.appendChild(detail);
+  });
+
   btnToMaps.disabled = false;
 }
 
@@ -76,15 +144,24 @@ const mapGrid = document.getElementById('map-grid');
 const btnStartFight = document.getElementById('btn-start-fight');
 
 function renderMapGrid() {
-  mapGrid.innerHTML = '';
+  while (mapGrid.firstChild) {
+    mapGrid.removeChild(mapGrid.firstChild);
+  }
+
   MAPS.forEach(map => {
     const card = document.createElement('div');
     card.className = 'map-card';
     card.dataset.id = map.id;
-    card.innerHTML = `
-      <div class="map-thumb" style="background:${map.thumbGradient}"></div>
-      <div class="map-card-name">${map.name}</div>
-    `;
+
+    const thumb = document.createElement('div');
+    thumb.className = 'map-thumb';
+    thumb.style.background = map.thumbGradient;
+
+    const name = document.createElement('div');
+    name.className = 'map-card-name';
+    name.textContent = map.name;
+
+    card.append(thumb, name);
     card.addEventListener('click', () => selectMap(map));
     mapGrid.appendChild(card);
   });
@@ -92,10 +169,24 @@ function renderMapGrid() {
 
 function selectMap(map) {
   selectedMap = map;
-  [...mapGrid.children].forEach(c => c.classList.toggle('selected', c.dataset.id === map.id));
+
+  [...mapGrid.children].forEach(c => {
+    c.classList.toggle('selected', c.dataset.id === map.id);
+  });
+
   document.getElementById('map-name').textContent = map.name;
   document.getElementById('map-desc').textContent = map.desc;
-  document.getElementById('map-features').innerHTML = map.features.map(f => `<span>${f}</span>`).join('');
+
+  // Features
+  const featuresEl = document.getElementById('map-features');
+  while (featuresEl.firstChild) featuresEl.removeChild(featuresEl.firstChild);
+
+  map.features.forEach(f => {
+    const span = document.createElement('span');
+    span.textContent = f;
+    featuresEl.appendChild(span);
+  });
+
   btnStartFight.disabled = false;
 }
 
@@ -147,14 +238,34 @@ if (!abilityTooltip) {
 }
 
 function showAbilityTooltip(slotEl, a, champ) {
-  abilityTooltip.innerHTML = `
-    <div class="at-head">
-      <span class="at-name">${a.name}</span>
-      <span class="at-meta">${a.cost ? `${a.cost} ${resourceLabel(champ)}` : 'No cost'} · ${a.cooldown}s CD</span>
-    </div>
-    <p class="at-desc">${a.desc}</p>
-  `;
+  // Clear previous content
+  while (abilityTooltip.firstChild) {
+    abilityTooltip.removeChild(abilityTooltip.firstChild);
+  }
+
+  const head = document.createElement('div');
+  head.className = 'at-head';
+
+  const name = document.createElement('span');
+  name.className = 'at-name';
+  name.textContent = a.name;
+
+  const meta = document.createElement('span');
+  meta.className = 'at-meta';
+  meta.textContent = a.cost
+    ? `${a.cost} ${resourceLabel(champ)} · ${a.cooldown}s CD`
+    : `No cost · ${a.cooldown}s CD`;
+
+  head.append(name, meta);
+
+  const desc = document.createElement('p');
+  desc.className = 'at-desc';
+  desc.textContent = a.desc;
+
+  abilityTooltip.append(head, desc);
   abilityTooltip.classList.remove('hidden');
+
+  // Positioning (unchanged)
   const rect = slotEl.getBoundingClientRect();
   const gameRect = screens.game.getBoundingClientRect();
   abilityTooltip.style.left = `${rect.left - gameRect.left + rect.width / 2}px`;
@@ -163,22 +274,37 @@ function showAbilityTooltip(slotEl, a, champ) {
 function hideAbilityTooltip() { abilityTooltip.classList.add('hidden'); }
 
 function buildAbilityBar(champ) {
-  abilityBar.innerHTML = '';
+  while (abilityBar.firstChild) {
+    abilityBar.removeChild(abilityBar.firstChild);
+  }
+
   champ.abilities.forEach((a, i) => {
     const slot = document.createElement('div');
     slot.className = 'ability-slot';
     slot.dataset.index = i;
-    slot.innerHTML = `
-      <span class="slot-key">${a.key}</span>
-      <span>${a.icon}</span>
-      <span class="slot-cost">${a.cost || ''}</span>
-      <div class="cooldown-veil hidden"></div>
-    `;
+
+    const key = document.createElement('span');
+    key.className = 'slot-key';
+    key.textContent = a.key;
+
+    const icon = document.createElement('span');
+    icon.textContent = a.icon;
+
+    const cost = document.createElement('span');
+    cost.className = 'slot-cost';
+    cost.textContent = a.cost || '';
+
+    const veil = document.createElement('div');
+    veil.className = 'cooldown-veil hidden';
+
+    slot.append(key, icon, cost, veil);
+
     slot.addEventListener('click', () => {
       if (game) game.tryPlayerAbility(i);
     });
     slot.addEventListener('mouseenter', () => showAbilityTooltip(slot, a, champ));
     slot.addEventListener('mouseleave', hideAbilityTooltip);
+
     abilityBar.appendChild(slot);
   });
 }
